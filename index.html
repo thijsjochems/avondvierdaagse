@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Avondvierdaagse Chatbot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f4f4;
+    }
+    #chatbox {
+      width: 400px;
+      max-height: 80vh;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .msg {
+      margin-bottom: 10px;
+    }
+    .user {
+      text-align: right;
+      color: blue;
+    }
+    .bot {
+      text-align: left;
+      color: green;
+    }
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    #input-area input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    #input-area button {
+      padding: 10px 16px;
+      border: none;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chatbox">
+  <div id="messages"></div>
+  <div id="input-area">
+    <input type="text" id="userInput" placeholder="Typ je bericht...">
+    <button onclick="sendMessage()">Verstuur</button>
+  </div>
+</div>
+
+<script>
+  const webhookUrl = "https://thijsjochems.app.n8n.cloud/webhook/Avondvierdaagse-ChatBot";
+
+  function appendMessage(text, className) {
+    const msg = document.createElement("div");
+    msg.className = "msg " + className;
+    msg.textContent = text;
+    document.getElementById("messages").appendChild(msg);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage(message, "user");
+    input.value = "";
+
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      const reply = data?.reply || "Geen antwoord ontvangen.";
+      appendMessage(reply, "bot");
+
+    } catch (err) {
+      appendMessage("Fout bij verbinden met chatbot.", "bot");
+      console.error(err);
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -124,6 +124,12 @@
   const input = document.getElementById("message");
   const webhookUrl = "https://thijsjochems.app.n8n.cloud/webhook/Avondvierdaagse-ChatBot";
 
+  let sessionId = localStorage.getItem("a4d_session");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("a4d_session", sessionId);
+  }
+
   const wandelZinnetjes = [
     "Ik loop even een blokje om...",
     "Even op pad met m’n gedachten...",
@@ -171,7 +177,7 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ message: userMessage, sessionId })
       });
 
       const data = await response.json();

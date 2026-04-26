@@ -1,0 +1,349 @@
+{
+  "name": "A4D - RAG bot AI Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        272
+      ],
+      "id": "6075c16a-0c8d-4ada-ab2b-c836e6c7fcb0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "agd7QJFru4n69J0F",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=Jij bent een expert als het neerkomt op de Avondvierdaagse van 2026.\n\nJouw primaire taak is het goed en precies beantwoorden van vragen, op basis van informatie die je uit de vector database kunt halen. Deze vector database bevat relevante informatie\n\nBelangrijk: je mag ALLEEN informatie verstrekken die je uit de documenten haalt. Als iets onduidelijk is, zeg dan helder en concreet dat je het niet weet of dat je niet genoeg informatie hebt om de vraag juist te kunnen beantwoorden.\n\nJouw antwoord:\n- is to-the-point en beknopt\n- altijd vriendelijk\n- gestructureerd (wanneer je een structuur hebt)\n\nJouw Doel: gebruikers voorzien van betrouwbare en snelle informatie over de Avondvierdaagse. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0a2f7276-e50f-4bcd-8d29-3c4a5edfb61f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "a4d",
+          "mode": "list",
+          "cachedResultName": "a4d"
+        },
+        "options": {
+          "pineconeNamespace": "a4d - GoogleDrive"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        464
+      ],
+      "id": "446ea74d-1860-4b6d-b344-a089fe5d2bb7",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "zH3fxQjtOAn5OYCm",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        640
+      ],
+      "id": "64cad009-0ce9-4e5b-a201-74a881e659e2",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "6UCYW55Y5rOIKHlZ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        464
+      ],
+      "id": "495c6021-9f50-4bbd-92c5-43310f5cde75",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "agd7QJFru4n69J0F",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Avondvierdaagse-ChatBot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        240
+      ],
+      "id": "5f43150d-b4f0-4e9f-bfeb-ba6ba1c5ed5c",
+      "name": "Webhook",
+      "webhookId": "78a34c6e-c17f-4893-aad7-b8de0fd105c3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "a4683b20-eb7d-486f-b061-a2bdd260b36b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      message: $json.output\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "662722cf-c7bc-4577-a4ff-24f13b81262c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "name": "A4D",
+        "description": "Heeft info over de Doornse Avondvierdaagse 2026"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        448,
+        240
+      ],
+      "id": "f56ed9b8-03b8-4536-9643-6bb8f90cda29",
+      "name": "A4D - Kennis"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        608
+      ],
+      "id": "ce8b71ed-4af5-4a5f-b5cc-e4b99b7b310b",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1111111-1111-1111-1111-111111111111",
+              "name": "sessionId",
+              "value": "={{ $json.body.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "a2222222-2222-2222-2222-222222222222",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "b3333333-3333-3333-3333-333333333333",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "A4D - Kennis",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "A4D - Kennis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A4D - Kennis": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b6470029-5cde-4aed-a8da-11a0a0b65295",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4244cf39054ad4ece3d87123b6889b0d2f2bd05c3476f8f55b63b4563f6cdbc2"
+  },
+  "id": "Z4Zb1sRuR0skBix2",
+  "tags": [
+    {
+      "updatedAt": "2025-04-16T19:49:55.584Z",
+      "createdAt": "2025-04-16T19:49:55.584Z",
+      "id": "mnz5KGPROGIYE7NY",
+      "name": "Avondvierdaagse"
+    }
+  ]
+}
